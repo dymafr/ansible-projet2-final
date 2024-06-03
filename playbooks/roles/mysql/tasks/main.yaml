@@ -1,0 +1,31 @@
+- name: Update APT packages
+  ansible.builtin.apt:
+    update_cache: true
+- name: Install MySQL server and Python3 adapter
+  ansible.builtin.apt:
+    name: 
+      - mysql-server
+      - python3-mysqldb
+    state: present
+- name: Configure MySQL to listen from every IP
+  ansible.builtin.lineinfile:
+    path: /etc/mysql/mysql.conf.d/mysqld.cnf
+    regexp: '^bind-address'
+    line: 'bind-address = 0.0.0.0'
+  notify: Restart MySQL server
+- name: Start MySQL server
+  ansible.builtin.service:
+    name: mysql
+    state: started
+    enabled: true
+- name: Create database
+  community.mysql.mysql_db:
+    name: "{{ mysql_database }}"
+    state: present
+- name: Create database user
+  community.mysql.mysql_user:
+    name: "{{ mysql_user }}"
+    password: "{{ mysql_password  }}"
+    priv: "{{ mysql_database }}.*:ALL"
+    host: '%'
+    state: present

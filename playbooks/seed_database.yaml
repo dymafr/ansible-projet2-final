@@ -1,0 +1,17 @@
+- name: Seed data for blog database
+  hosts: webserver
+  become: true
+  vars_files:
+    - /root/ansible/inventories/production/group_vars/mysql_vault.yaml
+  tasks:
+    - name: Install PHP
+      ansible.builtin.apt:
+        name: php8.3
+        state: present
+    - name: Exec database seed script
+      ansible.builtin.shell: |
+        export DB_HOST={{ hostvars[groups['dbserver'][0]].ansible_host }}
+        export DB_NAME={{ mysql_database }}
+        export DB_USER={{ mysql_user }}
+        export DB_PASSWORD={{ mysql_password }}
+        php /var/www/app/data/seed-articles.php
