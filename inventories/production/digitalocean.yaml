@@ -1,5 +1,5 @@
 plugin: community.digitalocean.digitalocean
-api_token: <token>
+api: <token>
 attributes:
   - id
   - name
